@@ -1,4 +1,9 @@
-import bwapi.*;
+import bwapi.DefaultBWListener;
+import bwapi.Game;
+import bwapi.Mirror;
+import bwapi.Player;
+import bwapi.Unit;
+
 import bwta.BWTA;
 
 public class TestBot1 extends DefaultBWListener {
@@ -43,7 +48,36 @@ public class TestBot1 extends DefaultBWListener {
                     return;
                 }
 
-                //
+                // Prevent spamming by only running our onFrame every number of latency frames.
+                // Latency frames are the number of frames before commands are processed.
+                if ( game.getFrameCount() % game.getLatencyFrames() != 0) {
+                    return;
+                }
+
+                // Iterate through all the units that we own
+                for(Unit u : game.getAllUnits()) {
+                    if ( !u.exists() )
+                        continue;
+
+                    if ( u.isLockedDown() || u.isMaelstrommed() || u.isStasised() ) 
+                        continue;
+
+                    if ( u.isLoaded() || !u.isPowered() || u.isStuck() )
+                        continue;
+
+                    if ( !u.isCompleted() || u.isConstructing() )
+                        continue;
+
+                    if ( u.getType().isWorker() ) {
+                        if (u.isIdle()) {
+                            if ( u.isCarryingGas() || u.isCarryingMinerals() )
+                                u.returnCargo();
+                            else if ( u.getPowerUp() != null ) {
+                                if (u.gather(u.getClosestUnit()) == null); 
+                            }
+                        }
+                    }
+                }
 
 
             }
